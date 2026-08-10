@@ -26,7 +26,7 @@ export default async function HomePage() {
       {posts.length === 0 && (
         <p className="mt-6 text-gray-500">
           No posts yet. Add some in the{" "}
-          <Link href="/studio" className="underline">
+          <Link href="/studio" prefetch={false} className="underline">
             Studio
           </Link>
           .
@@ -36,7 +36,7 @@ export default async function HomePage() {
       <ul className="mt-8 flex flex-col gap-8">
         {posts.map((post) => (
           <li key={post._id} className="border-b border-gray-100 pb-8">
-            <Link href={`/blog/${post.slug.current}`} className="group">
+            <Link href={`/blog/${post.slug.current}`} prefetch={false} className="group">
               {post.mainImage && (
                 <Image
                   src={urlFor(post.mainImage).width(800).height(400).url()}
