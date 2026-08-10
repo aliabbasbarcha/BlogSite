@@ -44,6 +44,21 @@ const portableTextComponents: PortableTextComponents = {
       />
     ),
   },
+  marks: {
+    link: ({ value, children }) => {
+      const href: string = value?.href || "";
+      const isExternal = /^https?:\/\//.test(href);
+      return (
+        <a
+          href={href}
+          className="text-indigo-600 underline underline-offset-2 hover:text-indigo-500"
+          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        >
+          {children}
+        </a>
+      );
+    },
+  },
 };
 
 export async function generateStaticParams() {
