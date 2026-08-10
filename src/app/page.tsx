@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { client } from "@/sanity/lib/client";
-import { urlForImage } from "@/sanity/lib/image";
+import { urlFor } from "@/sanity/lib/image";
 import { POSTS_QUERY } from "@/sanity/lib/queries";
 
 export const revalidate = 60;
@@ -39,7 +39,7 @@ export default async function HomePage() {
             <Link href={`/blog/${post.slug.current}`} className="group">
               {post.mainImage && (
                 <Image
-                  src={urlForImage(post.mainImage).width(800).height(400).url()}
+                  src={urlFor(post.mainImage).width(800).height(400).url()}
                   alt={post.title}
                   width={800}
                   height={400}

@@ -3,7 +3,7 @@ import { PortableText, type PortableTextBlock } from "next-sanity";
 import Image from "next/image";
 
 import { client } from "@/sanity/lib/client";
-import { urlForImage } from "@/sanity/lib/image";
+import { urlFor } from "@/sanity/lib/image";
 import { POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/lib/queries";
 
 export const revalidate = 60;
@@ -47,7 +47,7 @@ export default async function BlogPostPage({
 
       {post.mainImage && (
         <Image
-          src={urlForImage(post.mainImage).width(1200).height(600).url()}
+          src={urlFor(post.mainImage).width(1200).height(600).url()}
           alt={post.title}
           width={1200}
           height={600}
