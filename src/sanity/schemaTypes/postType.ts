@@ -47,8 +47,38 @@ export const postType = defineType({
       type: 'datetime',
     }),
     defineField({
+      name: 'excerpt',
+      title: 'Excerpt',
+      type: 'text',
+      rows: 3,
+      description: 'Short summary shown on the blog listing page.',
+    }),
+    defineField({
       name: 'body',
       type: 'blockContent',
+    }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'object',
+      options: {collapsible: true, collapsed: true},
+      fields: [
+        defineField({
+          name: 'metaTitle',
+          title: 'Meta title',
+          type: 'string',
+          description: 'Falls back to the post title if left empty. Keep under ~60 characters.',
+          validation: (rule) => rule.max(70).warning('Longer titles may get truncated in search results'),
+        }),
+        defineField({
+          name: 'metaDescription',
+          title: 'Meta description',
+          type: 'text',
+          rows: 3,
+          description: 'Falls back to the excerpt if left empty. Keep under ~160 characters.',
+          validation: (rule) => rule.max(200).warning('Longer descriptions may get truncated in search results'),
+        }),
+      ],
     }),
   ],
   preview: {

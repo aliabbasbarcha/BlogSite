@@ -22,6 +22,7 @@ export const POST_QUERY = defineQuery(`
     mainImage,
     body,
     publishedAt,
+    seo,
     "author": author->{name, image, bio},
     "categories": categories[]->{title}
   }

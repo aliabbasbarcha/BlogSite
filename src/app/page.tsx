@@ -12,7 +12,7 @@ type Post = {
   title: string;
   slug: { current: string };
   excerpt?: string;
-  mainImage?: import("sanity").Image;
+  mainImage?: import("sanity").Image & { alt?: string };
   publishedAt?: string;
 };
 
@@ -40,7 +40,7 @@ export default async function HomePage() {
               {post.mainImage && (
                 <Image
                   src={urlFor(post.mainImage).width(800).height(400).url()}
-                  alt={post.title}
+                  alt={post.mainImage.alt || post.title}
                   width={800}
                   height={400}
                   className="mb-4 h-48 w-full rounded-lg object-cover"
