@@ -1,66 +1,78 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
-import { POSTS_QUERY } from "@/sanity/lib/queries";
+import { LATEST_POSTS_QUERY } from "@/sanity/lib/queries";
+import { PostCard, type PostCardData } from "@/components/PostCard";
 
 export const revalidate = 60;
 
-type Post = {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  excerpt?: string;
-  mainImage?: import("sanity").Image & { alt?: string };
-  publishedAt?: string;
-};
+const LATEST_POSTS_LIMIT = 3;
 
 export default async function HomePage() {
-  const posts = await client.fetch<Post[]>(POSTS_QUERY);
+  const posts = await client.fetch<PostCardData[]>(LATEST_POSTS_QUERY, {
+    limit: LATEST_POSTS_LIMIT,
+  });
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">Latest posts</h1>
-
-      {posts.length === 0 && (
-        <p className="mt-6 text-gray-500">
-          No posts yet. Add some in the{" "}
-          <Link href="/studio" prefetch={false} className="underline">
-            Studio
-          </Link>
-          .
-        </p>
-      )}
-
-      <ul className="mt-8 flex flex-col gap-8">
-        {posts.map((post) => (
-          <li key={post._id} className="border-b border-gray-100 pb-8">
-            <Link href={`/blog/${post.slug.current}`} prefetch={false} className="group">
-              {post.mainImage && (
-                <Image
-                  src={urlFor(post.mainImage).width(800).height(400).url()}
-                  alt={post.mainImage.alt || post.title}
-                  width={800}
-                  height={400}
-                  className="mb-4 h-48 w-full rounded-lg object-cover"
-                />
-              )}
-              <h2 className="text-xl font-semibold group-hover:underline">
-                {post.title}
-              </h2>
-              {post.excerpt && (
-                <p className="mt-2 text-gray-600">{post.excerpt}</p>
-              )}
-              {post.publishedAt && (
-                <time className="mt-2 block text-sm text-gray-400">
-                  {new Date(post.publishedAt).toLocaleDateString()}
-                </time>
-              )}
+    <>
+      <section className="border-b border-gray-100 bg-gradient-to-b from-indigo-50 to-white">
+        <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
+            Welcome to BlogSite
+          </p>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            Words that inform.
+            <br />
+            Stories that inspire.
+          </h1>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-gray-600">
+            A space for in-depth articles, practical guides, and honest
+            perspectives.
+          </p>
+          <div className="mt-8 flex justify-center gap-4">
+            <Link
+              href="/blog"
+              prefetch={false}
+              className="rounded-md bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500"
+            >
+              Explore posts
             </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-16">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+            Latest posts
+          </h2>
+          {posts.length > 0 && (
+            <Link
+              href="/blog"
+              prefetch={false}
+              className="text-sm font-medium text-indigo-600 hover:underline"
+            >
+              View all posts →
+            </Link>
+          )}
+        </div>
+
+        {posts.length === 0 ? (
+          <p className="mt-6 text-gray-500">
+            No posts yet. Add some in the{" "}
+            <Link href="/studio" prefetch={false} className="underline">
+              Studio
+            </Link>
+            .
+          </p>
+        ) : (
+          <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))}
+          </div>
+        )}
+      </section>
+    </>
   );
 }

@@ -1,15 +1,22 @@
 import { defineQuery } from "next-sanity";
 
-export const POSTS_QUERY = defineQuery(`
-  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
-    _id,
-    title,
-    slug,
-    excerpt,
-    mainImage,
-    publishedAt,
-    "author": author->{name, image},
-    "categories": categories[]->{title}
+const POST_CARD_PROJECTION = `{
+  _id,
+  title,
+  slug,
+  excerpt,
+  mainImage,
+  publishedAt
+}`;
+
+export const LATEST_POSTS_QUERY = defineQuery(`
+  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) [0...$limit] ${POST_CARD_PROJECTION}
+`);
+
+export const PAGINATED_POSTS_QUERY = defineQuery(`
+  {
+    "posts": *[_type == "post" && defined(slug.current)] | order(publishedAt desc) [$start...$end] ${POST_CARD_PROJECTION},
+    "total": count(*[_type == "post" && defined(slug.current)])
   }
 `);
 
