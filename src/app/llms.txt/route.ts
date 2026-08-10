@@ -1,0 +1,35 @@
+import { client } from "@/sanity/lib/client";
+import { POSTS_INDEX_QUERY } from "@/sanity/lib/queries";
+import { siteDescription, siteName, siteUrl } from "@/lib/site";
+
+export const revalidate = 60;
+
+type PostEntry = {
+  title: string;
+  excerpt?: string;
+  slug: string;
+};
+
+export async function GET() {
+  const posts = await client.fetch<PostEntry[]>(POSTS_INDEX_QUERY);
+
+  const postLines = posts
+    .map((post) => {
+      const summary = post.excerpt ? `: ${post.excerpt}` : "";
+      return `- [${post.title}](${siteUrl}/blog/${post.slug})${summary}`;
+    })
+    .join("\n");
+
+  const body = `# ${siteName}
+
+> ${siteDescription}
+
+## Posts
+
+${postLines || "- No posts published yet."}
+`;
+
+  return new Response(body, {
+    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+  });
+}

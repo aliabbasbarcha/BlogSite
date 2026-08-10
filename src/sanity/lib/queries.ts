@@ -31,3 +31,13 @@ export const POST_QUERY = defineQuery(`
 export const POST_SLUGS_QUERY = defineQuery(`
   *[_type == "post" && defined(slug.current)][].slug.current
 `);
+
+export const POSTS_INDEX_QUERY = defineQuery(`
+  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
+    title,
+    excerpt,
+    "slug": slug.current,
+    publishedAt,
+    "updatedAt": _updatedAt
+  }
+`);

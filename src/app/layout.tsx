@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 
+import { siteDescription, siteName, siteUrl } from "@/lib/site";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -15,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BlogSite",
-  description: "A blog built with Next.js and Sanity",
+  metadataBase: new URL(siteUrl),
+  title: siteName,
+  description: siteDescription,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
