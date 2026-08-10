@@ -32,6 +32,15 @@ export const POST_SLUGS_QUERY = defineQuery(`
   *[_type == "post" && defined(slug.current)][].slug.current
 `);
 
+export const COMMENTS_QUERY = defineQuery(`
+  *[_type == "comment" && post._ref == $postId] | order(_createdAt asc) {
+    _id,
+    name,
+    text,
+    _createdAt
+  }
+`);
+
 export const POSTS_INDEX_QUERY = defineQuery(`
   *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
     title,

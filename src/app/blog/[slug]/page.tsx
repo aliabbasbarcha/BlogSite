@@ -5,9 +5,19 @@ import Image from "next/image";
 
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import { POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/lib/queries";
+import { writeClient } from "@/sanity/lib/writeClient";
+import { COMMENTS_QUERY, POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/lib/queries";
+
+import { CommentForm } from "./CommentForm";
 
 export const revalidate = 60;
+
+type Comment = {
+  _id: string;
+  name: string;
+  text: string;
+  _createdAt: string;
+};
 
 type SanityImage = import("sanity").Image & { alt?: string };
 
@@ -75,6 +85,10 @@ export default async function BlogPostPage({
     notFound();
   }
 
+  const comments = await writeClient.fetch<Comment[]>(COMMENTS_QUERY, {
+    postId: post._id,
+  });
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
@@ -102,6 +116,28 @@ export default async function BlogPostPage({
           <PortableText value={post.body} components={portableTextComponents} />
         </div>
       )}
+
+      <section className="mt-16 border-t border-gray-200 pt-8">
+        <h2 className="text-xl font-semibold">
+          Comments{comments.length > 0 && ` (${comments.length})`}
+        </h2>
+
+        <ul className="mt-6 flex flex-col gap-6">
+          {comments.map((comment) => (
+            <li key={comment._id} className="border-b border-gray-100 pb-6">
+              <div className="flex items-baseline justify-between">
+                <span className="font-medium text-gray-900">{comment.name}</span>
+                <time className="text-xs text-gray-400">
+                  {new Date(comment._createdAt).toLocaleDateString()}
+                </time>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap text-gray-700">{comment.text}</p>
+            </li>
+          ))}
+        </ul>
+
+        <CommentForm postId={post._id} slug={slug} />
+      </section>
     </article>
   );
 }
