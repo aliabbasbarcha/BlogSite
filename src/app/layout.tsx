@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 
@@ -27,8 +28,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-white text-gray-900">
         <header className="border-b border-gray-200">
           <nav className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-            <Link href="/" className="text-lg font-semibold">
-              BlogSite
+            <Link href="/" className="flex items-center">
+              <Image src="/logo.svg" alt="BlogSite" width={168} height={32} priority />
             </Link>
           </nav>
         </header>
