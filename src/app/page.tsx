@@ -5,7 +5,7 @@ import { LATEST_POSTS_QUERY } from "@/sanity/lib/queries";
 import { PostCard, type PostCardData } from "@/components/PostCard";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 const LATEST_POSTS_LIMIT = 3;
 

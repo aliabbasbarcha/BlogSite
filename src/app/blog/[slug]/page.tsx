@@ -12,7 +12,7 @@ import { CommentForm } from "./CommentForm";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 // New comments still show up immediately via the revalidatePath in ./actions.ts.
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 type Comment = {
   _id: string;

@@ -6,7 +6,7 @@ import { PostCard, type PostCardData } from "@/components/PostCard";
 import { Pagination } from "@/components/Pagination";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Blog",
