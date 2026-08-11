@@ -45,6 +45,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/blog" prefetch={false} className="hover:text-indigo-400">
                 Blog
               </Link>
+              <a
+                href="https://candlestickshub.com/tools/"
+                target="_blank"
+                rel="noopener"
+                className="hover:text-indigo-400"
+              >
+                Trading Tools
+              </a>
             </div>
           </nav>
         </header>

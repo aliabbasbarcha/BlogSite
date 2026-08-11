@@ -3,11 +3,60 @@ import Link from "next/link";
 import { client } from "@/sanity/lib/client";
 import { LATEST_POSTS_QUERY } from "@/sanity/lib/queries";
 import { PostCard, type PostCardData } from "@/components/PostCard";
+import { ToolCard, type ToolCardData } from "@/components/ToolCard";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 export const revalidate = 86400;
 
 const LATEST_POSTS_LIMIT = 3;
+
+const TRADING_TOOLS: ToolCardData[] = [
+  {
+    name: "Position Size Calculator",
+    description: "Exact lot size for forex, gold, crypto and futures",
+    href: "https://candlestickshub.com/tools/position-size-calculator/",
+  },
+  {
+    name: "Prop Firm Calculator",
+    description: "Drawdown, daily loss limit, profit target and consistency rule",
+    href: "https://candlestickshub.com/tools/prop-firm-calculator/",
+  },
+  {
+    name: "Trading Performance Calculator",
+    description: "Win rate, expectancy, risk-reward and breakeven",
+    href: "https://candlestickshub.com/tools/trading-performance-calculator/",
+  },
+  {
+    name: "Margin & Leverage Calculator",
+    description: "Required margin, free margin, margin call level",
+    href: "https://candlestickshub.com/tools/margin-leverage-calculator/",
+  },
+  {
+    name: "Profit & Loss Calculator",
+    description: "What a trade pays in forex pips, gold or crypto",
+    href: "https://candlestickshub.com/tools/profit-loss-calculator/",
+  },
+  {
+    name: "Compounding & DCA Calculator",
+    description: "Account growth and dollar cost averaging",
+    href: "https://candlestickshub.com/tools/compounding-dca-calculator/",
+  },
+  {
+    name: "Crypto Position Calculator",
+    description: "Liquidation price, funding rate cost, impermanent loss",
+    href: "https://candlestickshub.com/tools/crypto-position-calculator/",
+  },
+  {
+    name: "Crypto Tax Calculator",
+    description: "Cost basis using FIFO, LIFO or HIFO",
+    href: "https://candlestickshub.com/tools/crypto-tax-calculator/",
+  },
+  {
+    name: "Staking Yield Calculator",
+    description: "Real returns across major proof-of-stake coins",
+    href: "https://candlestickshub.com/tools/staking-calculator/",
+  },
+];
 
 export default async function HomePage() {
   const posts = await client.fetch<PostCardData[]>(LATEST_POSTS_QUERY, {
@@ -73,6 +122,24 @@ export default async function HomePage() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="border-t border-white/10">
+        <div className="mx-auto max-w-5xl px-4 py-16">
+          <h2 className="text-2xl font-bold tracking-tight text-white">
+            Free Trading Calculators
+          </h2>
+          <p className="mt-2 text-gray-400">
+            Risk, position size and prop firm tools — free, no signup, formulas
+            shown.
+          </p>
+
+          <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {TRADING_TOOLS.map((tool) => (
+              <ToolCard key={tool.href} tool={tool} />
+            ))}
+          </div>
+        </div>
       </section>
     </>
   );
