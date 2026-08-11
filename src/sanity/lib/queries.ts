@@ -1,5 +1,9 @@
 import { defineQuery } from "next-sanity";
 
+// Every post query is scoped to the current deployment's site so that
+// content authored for one site never leaks into another.
+const SITE_POST_FILTER = `_type == "post" && defined(slug.current) && site->siteId == $siteId`;
+
 const POST_CARD_PROJECTION = `{
   _id,
   title,
@@ -10,18 +14,18 @@ const POST_CARD_PROJECTION = `{
 }`;
 
 export const LATEST_POSTS_QUERY = defineQuery(`
-  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) [0...$limit] ${POST_CARD_PROJECTION}
+  *[${SITE_POST_FILTER}] | order(publishedAt desc) [0...$limit] ${POST_CARD_PROJECTION}
 `);
 
 export const PAGINATED_POSTS_QUERY = defineQuery(`
   {
-    "posts": *[_type == "post" && defined(slug.current)] | order(publishedAt desc) [$start...$end] ${POST_CARD_PROJECTION},
-    "total": count(*[_type == "post" && defined(slug.current)])
+    "posts": *[${SITE_POST_FILTER}] | order(publishedAt desc) [$start...$end] ${POST_CARD_PROJECTION},
+    "total": count(*[${SITE_POST_FILTER}])
   }
 `);
 
 export const POST_QUERY = defineQuery(`
-  *[_type == "post" && slug.current == $slug][0] {
+  *[_type == "post" && slug.current == $slug && site->siteId == $siteId][0] {
     _id,
     title,
     slug,
@@ -37,7 +41,7 @@ export const POST_QUERY = defineQuery(`
 `);
 
 export const POST_SLUGS_QUERY = defineQuery(`
-  *[_type == "post" && defined(slug.current)][].slug.current
+  *[${SITE_POST_FILTER}][].slug.current
 `);
 
 export const COMMENTS_QUERY = defineQuery(`
@@ -50,7 +54,7 @@ export const COMMENTS_QUERY = defineQuery(`
 `);
 
 export const POSTS_INDEX_QUERY = defineQuery(`
-  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
+  *[${SITE_POST_FILTER}] | order(publishedAt desc) {
     title,
     excerpt,
     "slug": slug.current,

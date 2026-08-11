@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { client } from "@/sanity/lib/client";
 import { POSTS_INDEX_QUERY } from "@/sanity/lib/queries";
-import { siteUrl } from "@/lib/site";
+import { siteId, siteUrl } from "@/lib/site";
 
 type PostEntry = {
   slug: string;
@@ -11,7 +11,7 @@ type PostEntry = {
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await client.fetch<PostEntry[]>(POSTS_INDEX_QUERY);
+  const posts = await client.fetch<PostEntry[]>(POSTS_INDEX_QUERY, { siteId });
 
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${siteUrl}/blog/${post.slug}`,

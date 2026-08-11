@@ -1,6 +1,6 @@
 import { client } from "@/sanity/lib/client";
 import { POSTS_INDEX_QUERY } from "@/sanity/lib/queries";
-import { siteDescription, siteName, siteUrl } from "@/lib/site";
+import { siteDescription, siteId, siteName, siteUrl } from "@/lib/site";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 export const revalidate = 86400;
@@ -12,7 +12,7 @@ type PostEntry = {
 };
 
 export async function GET() {
-  const posts = await client.fetch<PostEntry[]>(POSTS_INDEX_QUERY);
+  const posts = await client.fetch<PostEntry[]>(POSTS_INDEX_QUERY, { siteId });
 
   const postLines = posts
     .map((post) => {

@@ -4,6 +4,7 @@ import { client } from "@/sanity/lib/client";
 import { PAGINATED_POSTS_QUERY } from "@/sanity/lib/queries";
 import { PostCard, type PostCardData } from "@/components/PostCard";
 import { Pagination } from "@/components/Pagination";
+import { siteId } from "@/lib/site";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 export const revalidate = 86400;
@@ -37,7 +38,7 @@ export default async function BlogIndexPage({
   const { posts, total } = await client.fetch<{
     posts: PostCardData[];
     total: number;
-  }>(PAGINATED_POSTS_QUERY, { start, end });
+  }>(PAGINATED_POSTS_QUERY, { start, end, siteId });
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 

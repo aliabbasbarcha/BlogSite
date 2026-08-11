@@ -4,6 +4,7 @@ import { client } from "@/sanity/lib/client";
 import { LATEST_POSTS_QUERY } from "@/sanity/lib/queries";
 import { PostCard, type PostCardData } from "@/components/PostCard";
 import { ToolCard, type ToolCardData } from "@/components/ToolCard";
+import { siteId } from "@/lib/site";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 export const revalidate = 86400;
@@ -61,6 +62,7 @@ const TRADING_TOOLS: ToolCardData[] = [
 export default async function HomePage() {
   const posts = await client.fetch<PostCardData[]>(LATEST_POSTS_QUERY, {
     limit: LATEST_POSTS_LIMIT,
+    siteId,
   });
 
   return (

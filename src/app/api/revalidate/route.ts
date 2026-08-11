@@ -18,11 +18,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Invalid signature" }, { status: 401 });
   }
 
-  let payload: { _type?: string; slug?: string } = {};
+  let payload: { _type?: string; slug?: string; siteId?: string } = {};
   try {
     payload = JSON.parse(body);
   } catch {
     return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
+  }
+
+  // post/comment payloads carry a siteId (see README webhook projection); when
+  // present, only revalidate this deployment if it matches — a post/comment
+  // change on another site shouldn't refresh this one. Other document types
+  // (author, category, site) aren't site-scoped, so always revalidate for those.
+  if (payload.siteId && payload.siteId !== process.env.NEXT_PUBLIC_SITE_ID) {
+    return NextResponse.json({ revalidated: false, reason: "different site" });
   }
 
   revalidatePath("/");

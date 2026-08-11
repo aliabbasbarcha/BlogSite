@@ -7,7 +7,7 @@ import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { writeClient } from "@/sanity/lib/writeClient";
 import { COMMENTS_QUERY, POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/lib/queries";
-import { jsonLd, siteName, siteUrl } from "@/lib/site";
+import { jsonLd, siteId, siteName, siteUrl } from "@/lib/site";
 
 import { CommentForm } from "./CommentForm";
 import { ShareButtons } from "@/components/ShareButtons";
@@ -67,7 +67,7 @@ const portableTextComponents: PortableTextComponents = {
 };
 
 export async function generateStaticParams() {
-  const slugs = await client.fetch<string[]>(POST_SLUGS_QUERY);
+  const slugs = await client.fetch<string[]>(POST_SLUGS_QUERY, { siteId });
   return slugs.map((slug) => ({ slug }));
 }
 
@@ -75,7 +75,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/blog/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const post = await client.fetch<Post | null>(POST_QUERY, { slug });
+  const post = await client.fetch<Post | null>(POST_QUERY, { slug, siteId });
 
   if (!post) {
     return {};
@@ -102,7 +102,7 @@ export default async function BlogPostPage({
   params,
 }: PageProps<"/blog/[slug]">) {
   const { slug } = await params;
-  const post = await client.fetch<Post | null>(POST_QUERY, { slug });
+  const post = await client.fetch<Post | null>(POST_QUERY, { slug, siteId });
 
   if (!post) {
     notFound();

@@ -2,6 +2,8 @@
 
 A blog built with [Next.js](https://nextjs.org) (App Router), [Tailwind CSS](https://tailwindcss.com), and [Sanity](https://www.sanity.io) as the content backend. Content is managed through an embedded Sanity Studio at `/studio` — no separate admin app to run.
 
+This codebase is designed to be deployed multiple times (one deployment per domain) against the **same** Sanity project/dataset, with each deployment showing only the posts authored for it — see [Multi-site setup](#multi-site-setup).
+
 ## Features
 
 - Dark theme with an animated 3-color "aurora" gradient background (pure CSS, respects `prefers-reduced-motion`)
@@ -41,6 +43,7 @@ A blog built with [Next.js](https://nextjs.org) (App Router), [Tailwind CSS](htt
    | `NEXT_PUBLIC_SANITY_DATASET` | Usually `production` |
    | `NEXT_PUBLIC_SANITY_API_VERSION` | Sanity API version, e.g. `2024-01-01` |
    | `NEXT_PUBLIC_SITE_URL` | Public URL of the site (used in the sitemap, robots.txt, and SEO tags). Use `http://localhost:3000` locally |
+   | `NEXT_PUBLIC_SITE_ID` | Which `site` document's posts this deployment shows — must match a `siteId` value in the Studio (see [Multi-site setup](#multi-site-setup)) |
    | `SANITY_API_READ_TOKEN` | A Sanity API token with **Editor** permissions, used server-side to save and read comments. Not needed for writing posts in the Studio — that just needs you to be logged into your Sanity account in the browser. Create one at `sanity.io/manage` → your project → API → Tokens |
    | `SANITY_REVALIDATE_SECRET` | A random secret shared with the Sanity webhook (see [On-demand revalidation](#on-demand-revalidation) below). Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 
@@ -59,10 +62,20 @@ A blog built with [Next.js](https://nextjs.org) (App Router), [Tailwind CSS](htt
 
 Defined in [`src/sanity/schemaTypes`](src/sanity/schemaTypes):
 
-- **post** — title, slug, author, main image, categories, excerpt, body (rich text with inline images and links), SEO fields (meta title/description)
+- **post** — title, slug, **site** (required reference, see below), author, main image, categories, excerpt, body (rich text with inline images and links), SEO fields (meta title/description)
 - **author** — name, slug, image, bio
 - **category** — title, description
 - **comment** — name, comment text, reference to a post. Comments are created via a server action and publish immediately with no approval step; moderate by deleting unwanted ones from the Studio.
+- **site** — name, `siteId` (matches a deployment's `NEXT_PUBLIC_SITE_ID`), domain
+
+## Multi-site setup
+
+One Sanity project/dataset can back several deployments (domains), each showing only its own posts:
+
+- Every `post` has a required **Site** reference. Every GROQ query that lists or fetches posts filters by `site->siteId == $siteId`, where `$siteId` comes from that deployment's `NEXT_PUBLIC_SITE_ID` env var. A post from another site simply won't appear — including a direct hit on `/blog/<slug>`, which 404s.
+- **To add a new site**: create a `site` document in the Studio (name, a short lowercase `siteId`, domain), then deploy this same codebase as a new Vercel project with `NEXT_PUBLIC_SITE_ID` set to that `siteId` and its own `NEXT_PUBLIC_SITE_URL`. No code changes needed.
+- **Webhook**: since all sites share one dataset, Sanity sends the same change events to every deployment's webhook. The webhook projection includes each changed post/comment's `siteId` (see below), and [`/api/revalidate`](src/app/api/revalidate/route.ts) skips revalidating if it doesn't match `NEXT_PUBLIC_SITE_ID` — so create a webhook per deployment, all pointing at the same dataset.
+- `NEXT_PUBLIC_SITE_ID` is required — the app throws on startup if it's missing, rather than silently showing every site's posts.
 
 ## On-demand revalidation
 
@@ -72,9 +85,10 @@ Pages are cached for up to 24 hours as a fallback, but a Sanity webhook triggers
 2. **URL**: `https://<your-domain>/api/revalidate`
 3. **Dataset**: `production`
 4. **Trigger on**: Create, Update, Delete
-5. **Filter**: `_type in ["post", "comment", "author", "category"]`
-6. **Projection**: `{"_type": _type, "slug": slug.current}`
+5. **Filter**: `_type in ["post", "comment", "author", "category", "site"]`
+6. **Projection**: `{"_type": _type, "slug": slug.current, "siteId": select(_type == "post" => site->siteId, _type == "comment" => post->site->siteId)}`
 7. **Secret**: the same value as `SANITY_REVALIDATE_SECRET`
+8. Repeat for every deployment's domain (all pointing at the same dataset) — each one's handler ignores events for a different site.
 
 The handler lives at [`src/app/api/revalidate/route.ts`](src/app/api/revalidate/route.ts) — it verifies the request signature, then revalidates the home page, `/blog`, `sitemap.xml`, `llms.txt`, and (for posts) the specific post page.
 

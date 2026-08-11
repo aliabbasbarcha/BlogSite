@@ -19,6 +19,14 @@ export const postType = defineType({
       },
     }),
     defineField({
+      name: 'site',
+      title: 'Site',
+      type: 'reference',
+      to: [{type: 'site'}],
+      description: 'Which website this post should appear on.',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'author',
       type: 'reference',
       to: {type: 'author'},
@@ -85,11 +93,13 @@ export const postType = defineType({
     select: {
       title: 'title',
       author: 'author.name',
+      site: 'site.name',
       media: 'mainImage',
     },
     prepare(selection) {
-      const {author} = selection
-      return {...selection, subtitle: author && `by ${author}`}
+      const {author, site} = selection
+      const subtitle = [author && `by ${author}`, site].filter(Boolean).join(' · ')
+      return {...selection, subtitle}
     },
   },
 })
