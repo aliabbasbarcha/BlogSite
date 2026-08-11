@@ -14,7 +14,11 @@ const siteSecurityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' https://va.vercel-scripts.com",
+      // 'unsafe-inline' is required because Next.js's streaming/hydration
+      // bootstrap injects inline <script> tags with no nonce; without this,
+      // the browser blocks them and pages get stuck showing loading.tsx
+      // forever since the Suspense fallback never gets swapped for content.
+      "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https://cdn.sanity.io",
       "font-src 'self'",
