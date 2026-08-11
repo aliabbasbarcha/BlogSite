@@ -10,7 +10,9 @@ import { COMMENTS_QUERY, POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/lib/queri
 
 import { CommentForm } from "./CommentForm";
 
-export const revalidate = 60;
+// Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
+// New comments still show up immediately via the revalidatePath in ./actions.ts.
+export const revalidate = 3600;
 
 type Comment = {
   _id: string;
