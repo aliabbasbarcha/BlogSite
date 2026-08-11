@@ -7,6 +7,7 @@ import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { writeClient } from "@/sanity/lib/writeClient";
 import { COMMENTS_QUERY, POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/lib/queries";
+import { jsonLd, siteName, siteUrl } from "@/lib/site";
 
 import { CommentForm } from "./CommentForm";
 
@@ -30,6 +31,7 @@ type Post = {
   mainImage?: SanityImage;
   body?: PortableTextBlock[];
   publishedAt?: string;
+  updatedAt?: string;
   author?: { name: string };
   seo?: { metaTitle?: string; metaDescription?: string };
 };
@@ -87,6 +89,9 @@ export async function generateMetadata({
   return {
     title,
     description,
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
     openGraph: { title, description, images: ogImage },
     twitter: { card: "summary_large_image", title, description, images: ogImage },
   };
@@ -106,8 +111,29 @@ export default async function BlogPostPage({
     postId: post._id,
   });
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.mainImage
+      ? urlFor(post.mainImage).width(1200).height(630).url()
+      : undefined,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    author: post.author?.name
+      ? { "@type": "Person", name: post.author.name }
+      : undefined,
+    publisher: { "@type": "Organization", name: siteName },
+    mainEntityOfPage: `${siteUrl}/blog/${slug}`,
+  };
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(articleJsonLd) }}
+      />
       <h1 className="text-3xl font-bold tracking-tight text-white">{post.title}</h1>
       <div className="mt-2 text-sm text-gray-400">
         {post.author?.name && <span>{post.author.name}</span>}

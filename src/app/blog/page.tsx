@@ -8,12 +8,22 @@ import { Pagination } from "@/components/Pagination";
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  title: "Blog",
-  description: "All posts.",
-};
-
 const PAGE_SIZE = 6;
+
+export async function generateMetadata({
+  searchParams,
+}: PageProps<"/blog">): Promise<Metadata> {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  return {
+    title: "Blog",
+    description: "All posts.",
+    alternates: {
+      canonical: page > 1 ? `/blog?page=${page}` : "/blog",
+    },
+  };
+}
 
 export default async function BlogIndexPage({
   searchParams,

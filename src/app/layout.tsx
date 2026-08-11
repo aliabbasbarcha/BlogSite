@@ -6,7 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 import { Aurora } from "@/components/Aurora";
-import { siteDescription, siteName, siteUrl } from "@/lib/site";
+import { jsonLd, siteDescription, siteName, siteUrl } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +22,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: siteName,
   description: siteDescription,
+  alternates: {
+    canonical: "/",
+  },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteName,
+  description: siteDescription,
+  url: siteUrl,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -31,6 +42,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col text-gray-100">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd(websiteJsonLd) }}
+        />
         <Aurora />
 
         <header className="sticky top-0 z-50 border-b border-white/10 bg-black/30 backdrop-blur-md">
