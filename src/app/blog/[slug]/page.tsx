@@ -10,6 +10,7 @@ import { COMMENTS_QUERY, POST_QUERY, POST_SLUGS_QUERY } from "@/sanity/lib/queri
 import { jsonLd, siteName, siteUrl } from "@/lib/site";
 
 import { CommentForm } from "./CommentForm";
+import { ShareButtons } from "@/components/ShareButtons";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 // New comments still show up immediately via the revalidatePath in ./actions.ts.
@@ -135,13 +136,16 @@ export default async function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: jsonLd(articleJsonLd) }}
       />
       <h1 className="text-3xl font-bold tracking-tight text-white">{post.title}</h1>
-      <div className="mt-2 text-sm text-gray-400">
-        {post.author?.name && <span>{post.author.name}</span>}
-        {post.publishedAt && (
-          <time className="ml-2">
-            {new Date(post.publishedAt).toLocaleDateString()}
-          </time>
-        )}
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+        <div className="text-sm text-gray-400">
+          {post.author?.name && <span>{post.author.name}</span>}
+          {post.publishedAt && (
+            <time className="ml-2">
+              {new Date(post.publishedAt).toLocaleDateString()}
+            </time>
+          )}
+        </div>
+        <ShareButtons url={`${siteUrl}/blog/${slug}`} title={post.title} />
       </div>
 
       {post.mainImage && (
@@ -160,7 +164,11 @@ export default async function BlogPostPage({
         </div>
       )}
 
-      <section className="mt-16 border-t border-white/10 pt-8">
+      <div className="mt-10 border-t border-white/10 pt-6">
+        <ShareButtons url={`${siteUrl}/blog/${slug}`} title={post.title} />
+      </div>
+
+      <section className="mt-10 border-t border-white/10 pt-8">
         <h2 className="text-xl font-semibold text-white">
           Comments{comments.length > 0 && ` (${comments.length})`}
         </h2>
