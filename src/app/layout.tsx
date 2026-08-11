@@ -66,7 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 rel="noopener"
                 className="hover:text-indigo-400"
               >
-                Trading Tools
+                Trading Calculator
               </a>
             </div>
           </nav>
