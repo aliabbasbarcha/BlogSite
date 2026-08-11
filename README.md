@@ -4,11 +4,17 @@ A blog built with [Next.js](https://nextjs.org) (App Router), [Tailwind CSS](htt
 
 ## Features
 
-- Blog listing page and individual post pages, rendered from Sanity content
+- Dark theme with an animated 3-color "aurora" gradient background (pure CSS, respects `prefers-reduced-motion`)
+- Home page with a hero section and a compact "latest posts" grid
+- `/blog` — full post index, paginated 6 posts per page (GROQ slicing + count, so it never loads the whole collection at once)
 - Sanity Studio embedded at `/studio` for writing and editing posts
 - Per-post SEO fields (meta title/description) with sensible fallbacks, `sitemap.xml`, `robots.txt`, and `llms.txt`
 - A no-login comment system on each post (name + comment, no account required)
+- On-demand revalidation via a Sanity webhook — edits in the Studio update the live site within seconds instead of waiting on a timer
+- Loading skeletons for the post and blog-index routes
 - Custom SVG favicon and logo
+- [Vercel Speed Insights](https://vercel.com/docs/speed-insights)
+- Link prefetching is disabled site-wide to conserve request usage on Vercel's free plan
 
 ## Requirements
 
@@ -35,7 +41,8 @@ A blog built with [Next.js](https://nextjs.org) (App Router), [Tailwind CSS](htt
    | `NEXT_PUBLIC_SANITY_DATASET` | Usually `production` |
    | `NEXT_PUBLIC_SANITY_API_VERSION` | Sanity API version, e.g. `2024-01-01` |
    | `NEXT_PUBLIC_SITE_URL` | Public URL of the site (used in the sitemap, robots.txt, and SEO tags). Use `http://localhost:3000` locally |
-   | `SANITY_API_READ_TOKEN` | A Sanity API token with **Editor** permissions, used server-side to save comments. Not needed for writing posts in the Studio — that just needs you to be logged into your Sanity account in the browser. Create one at `sanity.io/manage` → your project → API → Tokens |
+   | `SANITY_API_READ_TOKEN` | A Sanity API token with **Editor** permissions, used server-side to save and read comments. Not needed for writing posts in the Studio — that just needs you to be logged into your Sanity account in the browser. Create one at `sanity.io/manage` → your project → API → Tokens |
+   | `SANITY_REVALIDATE_SECRET` | A random secret shared with the Sanity webhook (see [On-demand revalidation](#on-demand-revalidation) below). Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 
    If you don't have a Sanity project yet, run `npx sanity@latest init` in this folder and follow the prompts — it will create one and fill in the project ID/dataset for you.
 
@@ -52,29 +59,56 @@ A blog built with [Next.js](https://nextjs.org) (App Router), [Tailwind CSS](htt
 
 Defined in [`src/sanity/schemaTypes`](src/sanity/schemaTypes):
 
-- **post** — title, slug, author, main image, categories, excerpt, body (rich text with inline images), SEO fields
+- **post** — title, slug, author, main image, categories, excerpt, body (rich text with inline images and links), SEO fields (meta title/description)
 - **author** — name, slug, image, bio
 - **category** — title, description
 - **comment** — name, comment text, reference to a post. Comments are created via a server action and publish immediately with no approval step; moderate by deleting unwanted ones from the Studio.
 
+## On-demand revalidation
+
+Pages are cached for up to 24 hours as a fallback, but a Sanity webhook triggers an immediate refresh whenever content changes:
+
+1. In [sanity.io/manage](https://sanity.io/manage) → your project → **API** → **Webhooks** → **Create webhook**.
+2. **URL**: `https://<your-domain>/api/revalidate`
+3. **Dataset**: `production`
+4. **Trigger on**: Create, Update, Delete
+5. **Filter**: `_type in ["post", "comment", "author", "category"]`
+6. **Projection**: `{"_type": _type, "slug": slug.current}`
+7. **Secret**: the same value as `SANITY_REVALIDATE_SECRET`
+
+The handler lives at [`src/app/api/revalidate/route.ts`](src/app/api/revalidate/route.ts) — it verifies the request signature, then revalidates the home page, `/blog`, `sitemap.xml`, `llms.txt`, and (for posts) the specific post page.
+
 ## Project structure
 
 ```
-src/app/                   Routes (App Router)
-  page.tsx                 Blog listing (home page)
-  blog/[slug]/page.tsx     Post page (content + comments)
-  blog/[slug]/actions.ts   Server action that saves a new comment
-  studio/[[...tool]]/      Embedded Sanity Studio
-  sitemap.ts, robots.ts    Generated SEO files
-  llms.txt/route.ts        Generated llms.txt
+src/app/
+  page.tsx                   Home page (hero + latest posts)
+  blog/page.tsx               Paginated post index
+  blog/[slug]/page.tsx        Post page (content + comments)
+  blog/[slug]/actions.ts      Server action that saves a new comment
+  blog/[slug]/CommentForm.tsx Comment form (client component)
+  api/revalidate/route.ts     Sanity webhook handler (on-demand revalidation)
+  studio/[[...tool]]/         Embedded Sanity Studio
+  sitemap.ts, robots.ts       Generated SEO files
+  llms.txt/route.ts           Generated llms.txt
+  icon.svg                    Favicon
+src/components/
+  Aurora.tsx                  Animated gradient background
+  PostCard.tsx, Pagination.tsx
 src/sanity/
-  schemaTypes/             Content model
-  lib/                     Sanity clients and GROQ queries
+  schemaTypes/                Content model
+  lib/                        Sanity clients (read + write) and GROQ queries
+src/lib/site.ts                Site name/description/URL constants
 ```
 
 ## Deployment
 
-Deploys cleanly to [Vercel](https://vercel.com/new): set the same environment variables from `.env.local` in the project settings (with `NEXT_PUBLIC_SITE_URL` set to your production domain), then deploy. In your Sanity project's API settings, add your production URL to **CORS origins**.
+Deploys cleanly to [Vercel](https://vercel.com/new):
+
+1. Set the same environment variables from `.env.local` in the project settings, with `NEXT_PUBLIC_SITE_URL` set to your production domain.
+2. In your Sanity project's API settings, add your production URL to **CORS origins**.
+3. Set up the [on-demand revalidation webhook](#on-demand-revalidation) pointing at your production domain.
+4. Enable **Speed Insights** for the project in the Vercel dashboard (Speed Insights tab) to start collecting data.
 
 ## Learn more
 
