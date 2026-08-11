@@ -4,7 +4,7 @@ export const siteUrl = (
 
 export const siteName = "BlogSite";
 
-export const siteDescription = "A blog built with Next.js and Sanity";
+export const siteDescription = "A blog site for sharing knowledge and insights on various topics, including technology, programming, and personal experiences.";
 
 // Escapes "<" so a "</script>" inside CMS content can't break out of a
 // JSON-LD <script> tag when injected via dangerouslySetInnerHTML.

@@ -17,8 +17,9 @@ export async function generateMetadata({
   const page = Math.max(1, Number(pageParam) || 1);
 
   return {
-    title: "Blog",
-    description: "All posts.",
+    title: page > 1 ? `Blog — Page ${page}` : "Blog",
+    description:
+      "Browse every article on BlogSite — in-depth guides, practical tips, and honest perspectives, newest first.",
     alternates: {
       canonical: page > 1 ? `/blog?page=${page}` : "/blog",
     },
@@ -43,6 +44,10 @@ export default async function BlogIndexPage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-white">Blog</h1>
+      <p className="mt-2 max-w-2xl text-gray-400">
+        Every article on BlogSite, newest first — in-depth guides, practical
+        tips, and honest perspectives.
+      </p>
 
       {posts.length === 0 ? (
         <p className="mt-6 text-gray-400">No posts found on this page.</p>
