@@ -14,7 +14,7 @@ import { ShareButtons } from "@/components/ShareButtons";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
 // New comments still show up immediately via the revalidatePath in ./actions.ts.
-export const revalidate = 86400;
+export const revalidate = 604800;
 
 type Comment = {
   _id: string;

@@ -7,7 +7,7 @@ import { ToolCard, type ToolCardData } from "@/components/ToolCard";
 import { siteId } from "@/lib/site";
 
 // Fallback in case the Sanity webhook (see src/app/api/revalidate) doesn't fire.
-export const revalidate = 86400;
+export const revalidate = 604800;
 
 const LATEST_POSTS_LIMIT = 3;
 
