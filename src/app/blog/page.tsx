@@ -31,10 +31,10 @@ export default async function BlogIndexPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">Blog</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-white">Blog</h1>
 
       {posts.length === 0 ? (
-        <p className="mt-6 text-gray-500">No posts found on this page.</p>
+        <p className="mt-6 text-gray-400">No posts found on this page.</p>
       ) : (
         <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (

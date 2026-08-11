@@ -15,17 +15,17 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="border-b border-gray-100 bg-gradient-to-b from-indigo-50 to-white">
-        <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
+      <section className="border-b border-white/10">
+        <div className="mx-auto max-w-3xl px-4 py-24 text-center">
+          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-400">
             Welcome to BlogSite
           </p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+          <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Words that inform.
             <br />
             Stories that inspire.
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-gray-600">
+          <p className="mx-auto mt-4 max-w-xl text-lg text-gray-300">
             A space for in-depth articles, practical guides, and honest
             perspectives.
           </p>
@@ -33,7 +33,7 @@ export default async function HomePage() {
             <Link
               href="/blog"
               prefetch={false}
-              className="rounded-md bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500"
+              className="rounded-md bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 hover:bg-indigo-500"
             >
               Explore posts
             </Link>
@@ -43,14 +43,14 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-5xl px-4 py-16">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h2 className="text-2xl font-bold tracking-tight text-white">
             Latest posts
           </h2>
           {posts.length > 0 && (
             <Link
               href="/blog"
               prefetch={false}
-              className="text-sm font-medium text-indigo-600 hover:underline"
+              className="text-sm font-medium text-indigo-400 hover:underline"
             >
               View all posts →
             </Link>
@@ -58,9 +58,9 @@ export default async function HomePage() {
         </div>
 
         {posts.length === 0 ? (
-          <p className="mt-6 text-gray-500">
+          <p className="mt-6 text-gray-400">
             No posts yet. Add some in the{" "}
-            <Link href="/studio" prefetch={false} className="underline">
+            <Link href="/studio" prefetch={false} className="text-indigo-400 underline">
               Studio
             </Link>
             .

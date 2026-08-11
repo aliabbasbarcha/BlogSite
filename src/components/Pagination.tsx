@@ -19,7 +19,7 @@ export function Pagination({
         <Link
           href={pageHref(currentPage - 1)}
           prefetch={false}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="rounded-md border border-white/15 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/10"
         >
           ← Previous
         </Link>
@@ -27,7 +27,7 @@ export function Pagination({
         <span />
       )}
 
-      <span className="text-sm text-gray-500">
+      <span className="text-sm text-gray-400">
         Page {currentPage} of {totalPages}
       </span>
 
@@ -35,7 +35,7 @@ export function Pagination({
         <Link
           href={pageHref(currentPage + 1)}
           prefetch={false}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="rounded-md border border-white/15 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/10"
         >
           Next →
         </Link>

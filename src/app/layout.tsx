@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 
+import { Aurora } from "@/components/Aurora";
 import { siteDescription, siteName, siteUrl } from "@/lib/site";
 
 const geistSans = Geist({
@@ -28,25 +29,29 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-gray-900">
-        <header className="border-b border-gray-200">
+      <body className="min-h-full flex flex-col text-gray-100">
+        <Aurora />
+
+        <header className="sticky top-0 z-50 border-b border-white/10 bg-black/30 backdrop-blur-md">
           <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
             <Link href="/" prefetch={false} className="flex items-center">
               <Image src="/logo.svg" alt="BlogSite" width={168} height={32} priority />
             </Link>
-            <div className="flex items-center gap-6 text-sm font-medium text-gray-700">
-              <Link href="/" prefetch={false} className="hover:text-indigo-600">
+            <div className="flex items-center gap-6 text-sm font-medium text-gray-300">
+              <Link href="/" prefetch={false} className="hover:text-indigo-400">
                 Home
               </Link>
-              <Link href="/blog" prefetch={false} className="hover:text-indigo-600">
+              <Link href="/blog" prefetch={false} className="hover:text-indigo-400">
                 Blog
               </Link>
             </div>
           </nav>
         </header>
+
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-gray-200">
-          <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-gray-500">
+
+        <footer className="border-t border-white/10 bg-black/30 backdrop-blur-md">
+          <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-gray-400">
             © {new Date().getFullYear()} BlogSite
           </div>
         </footer>

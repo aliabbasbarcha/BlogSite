@@ -27,7 +27,7 @@ export function CommentForm({ postId, slug }: { postId: string; slug: string }) 
       </div>
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-300">
           Name
         </label>
         <input
@@ -35,12 +35,12 @@ export function CommentForm({ postId, slug }: { postId: string; slug: string }) 
           name="name"
           required
           maxLength={80}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+          className="mt-1 w-full rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:border-indigo-400 focus:outline-none"
         />
       </div>
 
       <div>
-        <label htmlFor="text" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="text" className="block text-sm font-medium text-gray-300">
           Comment
         </label>
         <textarea
@@ -49,15 +49,15 @@ export function CommentForm({ postId, slug }: { postId: string; slug: string }) 
           required
           maxLength={2000}
           rows={4}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+          className="mt-1 w-full rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:border-indigo-400 focus:outline-none"
         />
       </div>
 
       {state.status === "error" && (
-        <p className="text-sm text-red-600">{state.message}</p>
+        <p className="text-sm text-red-400">{state.message}</p>
       )}
       {state.status === "success" && (
-        <p className="text-sm text-green-600">Comment posted.</p>
+        <p className="text-sm text-green-400">Comment posted.</p>
       )}
 
       <button

@@ -17,7 +17,7 @@ export function PostCard({ post }: { post: PostCardData }) {
     <Link
       href={`/blog/${post.slug.current}`}
       prefetch={false}
-      className="group flex flex-col overflow-hidden rounded-lg border border-gray-100"
+      className="group flex flex-col overflow-hidden rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm transition hover:border-white/20 hover:bg-white/10"
     >
       {post.mainImage ? (
         <Image
@@ -28,17 +28,17 @@ export function PostCard({ post }: { post: PostCardData }) {
           className="h-44 w-full object-cover"
         />
       ) : (
-        <div className="h-44 w-full bg-gradient-to-br from-indigo-100 to-violet-100" />
+        <div className="h-44 w-full bg-gradient-to-br from-indigo-500/30 via-fuchsia-500/20 to-cyan-500/30" />
       )}
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-lg font-semibold text-gray-900 group-hover:underline">
+        <h3 className="text-lg font-semibold text-gray-50 group-hover:underline">
           {post.title}
         </h3>
         {post.excerpt && (
-          <p className="mt-2 line-clamp-3 text-sm text-gray-600">{post.excerpt}</p>
+          <p className="mt-2 line-clamp-3 text-sm text-gray-400">{post.excerpt}</p>
         )}
         {post.publishedAt && (
-          <time className="mt-4 text-xs text-gray-400">
+          <time className="mt-4 text-xs text-gray-500">
             {new Date(post.publishedAt).toLocaleDateString()}
           </time>
         )}

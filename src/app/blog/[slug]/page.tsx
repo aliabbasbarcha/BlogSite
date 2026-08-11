@@ -51,7 +51,7 @@ const portableTextComponents: PortableTextComponents = {
       return (
         <a
           href={href}
-          className="text-indigo-600 underline underline-offset-2 hover:text-indigo-500"
+          className="text-indigo-400 underline underline-offset-2 hover:text-indigo-300"
           {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
         >
           {children}
@@ -106,8 +106,8 @@ export default async function BlogPostPage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
-      <div className="mt-2 text-sm text-gray-500">
+      <h1 className="text-3xl font-bold tracking-tight text-white">{post.title}</h1>
+      <div className="mt-2 text-sm text-gray-400">
         {post.author?.name && <span>{post.author.name}</span>}
         {post.publishedAt && (
           <time className="ml-2">
@@ -127,26 +127,26 @@ export default async function BlogPostPage({
       )}
 
       {post.body && (
-        <div className="prose prose-gray mt-8 max-w-none">
+        <div className="prose prose-invert mt-8 max-w-none prose-a:text-indigo-400">
           <PortableText value={post.body} components={portableTextComponents} />
         </div>
       )}
 
-      <section className="mt-16 border-t border-gray-200 pt-8">
-        <h2 className="text-xl font-semibold">
+      <section className="mt-16 border-t border-white/10 pt-8">
+        <h2 className="text-xl font-semibold text-white">
           Comments{comments.length > 0 && ` (${comments.length})`}
         </h2>
 
         <ul className="mt-6 flex flex-col gap-6">
           {comments.map((comment) => (
-            <li key={comment._id} className="border-b border-gray-100 pb-6">
+            <li key={comment._id} className="border-b border-white/10 pb-6">
               <div className="flex items-baseline justify-between">
-                <span className="font-medium text-gray-900">{comment.name}</span>
-                <time className="text-xs text-gray-400">
+                <span className="font-medium text-gray-100">{comment.name}</span>
+                <time className="text-xs text-gray-500">
                   {new Date(comment._createdAt).toLocaleDateString()}
                 </time>
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-gray-700">{comment.text}</p>
+              <p className="mt-2 whitespace-pre-wrap text-gray-300">{comment.text}</p>
             </li>
           ))}
         </ul>
