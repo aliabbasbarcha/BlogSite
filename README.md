@@ -7,16 +7,19 @@ This codebase is designed to be deployed multiple times (one deployment per doma
 ## Features
 
 - Dark theme with an animated 3-color "aurora" gradient background (pure CSS, respects `prefers-reduced-motion`)
-- Home page with a hero section and a compact "latest posts" grid
+- Home page with a hero section, a compact "latest posts" grid, and a "Free Trading Calculators" section linking out to candlestickshub.com
 - `/blog` — full post index, paginated 6 posts per page (GROQ slicing + count, so it never loads the whole collection at once)
 - Sanity Studio embedded at `/studio` for writing and editing posts
-- Per-post SEO fields (meta title/description) with sensible fallbacks, `sitemap.xml`, `robots.txt`, and `llms.txt`
+- Multi-site content scoping — one Sanity project/dataset can back several domains (see [Multi-site setup](#multi-site-setup))
+- Per-post SEO fields (meta title/description) with sensible fallbacks, self-referencing canonical URLs on every page, JSON-LD structured data (`WebSite` + `BlogPosting`), `sitemap.xml`, `robots.txt`, and `llms.txt`
+- Social share buttons (X, LinkedIn, Facebook, WhatsApp, copy-link) on every post
 - A no-login comment system on each post (name + comment, no account required)
-- On-demand revalidation via a Sanity webhook — edits in the Studio update the live site within seconds instead of waiting on a timer
-- Loading skeletons for the post and blog-index routes
+- On-demand revalidation via a Sanity webhook — edits in the Studio update the live site within seconds, with a 1-week time-based fallback
+- Loading skeletons and an error boundary for the post and blog-index routes
+- Security headers (`Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) applied to every route except `/studio`
 - Custom SVG favicon and logo
 - [Vercel Speed Insights](https://vercel.com/docs/speed-insights)
-- Link prefetching is disabled site-wide to conserve request usage on Vercel's free plan
+- Link prefetching is disabled site-wide to conserve request usage on free hosting plans
 
 ## Requirements
 
@@ -79,7 +82,7 @@ One Sanity project/dataset can back several deployments (domains), each showing 
 
 ## On-demand revalidation
 
-Pages are cached for up to 24 hours as a fallback, but a Sanity webhook triggers an immediate refresh whenever content changes:
+Pages are cached for up to 1 week as a fallback, but a Sanity webhook triggers an immediate refresh whenever content changes:
 
 1. In [sanity.io/manage](https://sanity.io/manage) → your project → **API** → **Webhooks** → **Create webhook**.
 2. **URL**: `https://<your-domain>/api/revalidate`
@@ -96,9 +99,12 @@ The handler lives at [`src/app/api/revalidate/route.ts`](src/app/api/revalidate/
 
 ```
 src/app/
-  page.tsx                   Home page (hero + latest posts)
+  page.tsx                   Home page (hero + latest posts + trading tools)
   blog/page.tsx               Paginated post index
-  blog/[slug]/page.tsx        Post page (content + comments)
+  blog/loading.tsx             Loading skeleton for the index
+  blog/error.tsx                Error boundary for /blog and /blog/[slug]
+  blog/[slug]/page.tsx        Post page (content, share buttons, comments)
+  blog/[slug]/loading.tsx      Loading skeleton for a post
   blog/[slug]/actions.ts      Server action that saves a new comment
   blog/[slug]/CommentForm.tsx Comment form (client component)
   api/revalidate/route.ts     Sanity webhook handler (on-demand revalidation)
@@ -108,21 +114,27 @@ src/app/
   icon.svg                    Favicon
 src/components/
   Aurora.tsx                  Animated gradient background
-  PostCard.tsx, Pagination.tsx
+  PostCard.tsx, Pagination.tsx, ToolCard.tsx, ShareButtons.tsx
 src/sanity/
-  schemaTypes/                Content model
+  schemaTypes/                Content model (post, author, category, comment, site)
   lib/                        Sanity clients (read + write) and GROQ queries
-src/lib/site.ts                Site name/description/URL constants
+src/lib/site.ts                Site name/description/URL/site-ID constants, jsonLd() helper
+next.config.ts                 Security headers (CSP etc.) and Sanity image remote pattern
 ```
 
 ## Deployment
 
-Deploys cleanly to [Vercel](https://vercel.com/new):
+Deploys cleanly to [Vercel](https://vercel.com/new) or [Netlify](https://netlify.com):
 
-1. Set the same environment variables from `.env.local` in the project settings, with `NEXT_PUBLIC_SITE_URL` set to your production domain.
+1. Set the same environment variables from `.env.local` in the project settings, with `NEXT_PUBLIC_SITE_URL` set to your production domain and `NEXT_PUBLIC_SITE_ID` set per deployment (see [Multi-site setup](#multi-site-setup)).
 2. In your Sanity project's API settings, add your production URL to **CORS origins**.
 3. Set up the [on-demand revalidation webhook](#on-demand-revalidation) pointing at your production domain.
-4. Enable **Speed Insights** for the project in the Vercel dashboard (Speed Insights tab) to start collecting data.
+4. On Vercel: enable **Speed Insights** for the project in the dashboard (Speed Insights tab) to start collecting data.
+5. On Netlify: the Next.js build can fail with "Secrets scanning found secrets in build" because `NEXT_PUBLIC_*` values are (correctly) inlined into the client bundle, and Netlify's scanner flags that by default. Fix by adding an env var listing every configured key:
+   ```
+   SECRETS_SCAN_OMIT_KEYS=NEXT_PUBLIC_SANITY_PROJECT_ID,NEXT_PUBLIC_SANITY_DATASET,NEXT_PUBLIC_SANITY_API_VERSION,NEXT_PUBLIC_SITE_ID,NEXT_PUBLIC_SITE_URL,SANITY_API_READ_TOKEN,SANITY_REVALIDATE_SECRET
+   ```
+   (no spaces after the commas), then redeploy with cache cleared.
 
 ## Learn more
 
